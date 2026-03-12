@@ -6,6 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const newClientForm = document.getElementById('new-client-form');
     const clientSelect = document.getElementById('client-select');
     const totalValueInput = document.getElementById('total-value');
+    const zoomSlider = document.getElementById('zoom-slider');
+    const zoomValue = document.getElementById('zoom-value');
+    const invoiceDocument = document.getElementById('invoice-document');
+
+    // Zoom Logic
+    zoomSlider.addEventListener('input', (e) => {
+        const scale = e.target.value;
+        zoomValue.textContent = `${Math.round(scale * 100)}%`;
+        invoiceDocument.style.transform = `scale(${scale})`;
+    });
 
     // Format number with dots and convert to words in real-time
     totalValueInput.addEventListener('input', (e) => {
