@@ -107,6 +107,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // DOM Element for Download Button
+    const btnDownloadPdf = document.getElementById('btn-download-pdf');
+
+    // PDF Export Logic (Native Print)
+    btnDownloadPdf.addEventListener('click', () => {
+        let clientName = previewClientName.textContent;
+        if (clientName === '[NOMBRE DEL CLIENTE O EMPRESA]') {
+            clientName = 'SIN_NOMBRE';
+        }
+
+        let dateStr = invoiceDateInput.value;
+        let formattedDate = 'SIN_FECHA';
+        
+        if (dateStr) {
+            const [year, month, day] = dateStr.split('-');
+            const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+            formattedDate = `${day}-${monthNames[parseInt(month) - 1]}-${year}`;
+        }
+
+        const filename = `CUENTA DE COBRO ${clientName} (${formattedDate})`;
+
+        const originalTitle = document.title;
+        document.title = filename;
+
+        const currentTransform = invoiceDocument.style.transform;
+        invoiceDocument.style.transform = 'scale(1)';
+
+        window.print();
+
+        document.title = originalTitle;
+        invoiceDocument.style.transform = currentTransform;
+    });
+
     // --- Helper Functions ---
 
     function closeModal() {
