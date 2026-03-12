@@ -7,6 +7,30 @@
     <title>Invoice Generator</title>
     <link rel="icon" href="data:,">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body { background: white; }
+            body * { visibility: hidden; }
+            
+            #invoice-document, #invoice-document * { visibility: visible; }
+            
+            #invoice-document {
+                position: absolute;
+                left: 0;
+                top: 0;
+                margin: 0;
+                box-shadow: none;
+                width: 216mm;
+                min-height: 279mm;
+                transform: scale(1) !important;
+            }
+            
+            @page {
+                size: letter;
+                margin: 0; 
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
@@ -53,63 +77,68 @@
                     </div>
 
                 </form>
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" id="btn-download-pdf"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md shadow-sm transition-colors text-lg">
+                        Descargar PDF
+                    </button>
+                </div>
+        </div>
+
+
+
+        <div class="flex flex-col gap-4">
+            <div class="bg-white border border-gray-200 p-3 rounded shadow-sm flex items-center justify-between">
+                <label for="zoom-slider" class="text-sm font-medium text-gray-700">Zoom: <span
+                        id="zoom-value">100%</span></label>
+                <input type="range" id="zoom-slider" min="0.4" max="1.2" step="0.1" value="1"
+                    class="w-2/3 cursor-pointer">
             </div>
 
-            <div class="flex flex-col gap-4">
-                <div class="bg-white border border-gray-200 p-3 rounded shadow-sm flex items-center justify-between">
-                    <label for="zoom-slider" class="text-sm font-medium text-gray-700">Zoom: <span
-                            id="zoom-value">100%</span></label>
-                    <input type="range" id="zoom-slider" min="0.4" max="1.2" step="0.1" value="1"
-                        class="w-2/3 cursor-pointer">
-                </div>
+            <div id="preview-section" class="border border-gray-200 p-4 rounded bg-gray-200 overflow-auto max-h-[85vh]">
+                <div id="invoice-document" class="mx-auto bg-white shrink-0 w-[216mm] min-h-[279mm] px-16 py-20 sm:px-24 sm:py-24 shadow-md text-black origin-top transition-transform duration-200" style="font-family: 'Times New Roman', Times, serif;">
 
-                <div id="preview-section"
-                    class="border border-gray-200 p-4 rounded bg-gray-200 overflow-auto max-h-[85vh]">
-                    <div id="invoice-document"
-                        class="mx-auto bg-white shrink-0 w-[216mm] min-h-[279mm] p-12 md:p-16 shadow-md text-black origin-top transition-transform duration-200"
-                        style="font-family: 'Times New Roman', Times, serif;">
+                    <div class="mb-10 font-bold text-lg uppercase">
+                        <p>BARRANQUILLA <span id="preview-date">[FECHA]</span></p>
+                        <p class="mt-2">CUENTA DE COBRO</p>
+                    </div>
 
-                        <div class="mb-10 font-bold text-lg uppercase">
-                            <p>BARRANQUILLA <span id="preview-date">[FECHA]</span></p>
-                            <p class="mt-2">CUENTA DE COBRO</p>
-                        </div>
+                    <div class="text-center mb-10 font-bold text-lg uppercase">
+                        <p id="preview-client-name">[NOMBRE DEL CLIENTE O EMPRESA]</p>
+                        <p class="mt-2">NIT: <span id="preview-client-nit">[NIT]</span></p>
+                    </div>
 
-                        <div class="text-center mb-10 font-bold text-lg uppercase">
-                            <p id="preview-client-name">[NOMBRE DEL CLIENTE O EMPRESA]</p>
-                            <p class="mt-2">NIT: <span id="preview-client-nit">[NIT]</span></p>
-                        </div>
+                    <div class="text-center mb-10 font-bold text-lg">
+                        <p>DEBE A:</p>
+                    </div>
 
-                        <div class="text-center mb-10 font-bold text-lg">
-                            <p>DEBE A:</p>
-                        </div>
+                    <div class="text-center mb-10 font-bold text-lg">
+                        <p>Edwin Garcia Puliecer</p>
+                        <p class="mt-2">C.C: [CÉDULA_AQUÍ]</p>
+                    </div>
 
-                        <div class="text-center mb-10 font-bold text-lg">
-                            <p>Edwin Garcia Puliecer</p>
-                            <p class="mt-2">C.C: [CÉDULA_AQUÍ]</p>
-                        </div>
+                    <div class="text-center mb-8 font-bold text-lg">
+                        <p>$ <span id="preview-total-value">[0]</span></p>
+                    </div>
 
-                        <div class="text-center mb-8 font-bold text-lg">
-                            <p>$ <span id="preview-total-value">[0]</span></p>
-                        </div>
+                    <div class="text-justify mb-12 text-lg leading-relaxed">
+                        <p>
+                            La suma de <span id="preview-words-value" class="lowercase">[valor en letras]</span> por
+                            concepto de: <span id="preview-concept">[concepto del trabajo]</span>, el cual autorizo
+                            sean consignados en número de cuenta [NÚMERO_CUENTA_AQUÍ] de ahorros de Bancolombia.
+                        </p>
+                    </div>
 
-                        <div class="text-justify mb-12 text-lg leading-relaxed">
-                            <p>
-                                La suma de <span id="preview-words-value" class="lowercase">[valor en letras]</span> por
-                                concepto de: <span id="preview-concept">[concepto del trabajo]</span>, el cual autorizo
-                                sean consignados en número de cuenta [NÚMERO_CUENTA_AQUÍ] de ahorros de Bancolombia.
-                            </p>
-                        </div>
-
-                        <div class="text-left text-lg">
-                            <p class="mb-8">Por medio de la presente declaro no soy responsable de IVA</p>
-                            <p>Atentamente</p>
-                            <br><br><br>
-                            <p>Edwin Garcia Puliecer</p>
-                        </div>
+                    <div class="text-left text-lg">
+                        <p class="mb-8">Por medio de la presente declaro no soy responsable de IVA</p>
+                        <p>Atentamente</p>
+                        <br><br><br>
+                        <p>Edwin Garcia Puliecer</p>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <div id="client-modal"
