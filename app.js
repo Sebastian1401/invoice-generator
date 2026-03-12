@@ -5,6 +5,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const clientModal = document.getElementById('client-modal');
     const newClientForm = document.getElementById('new-client-form');
     const clientSelect = document.getElementById('client-select');
+    const totalValueInput = document.getElementById('total-value');
+
+    // Format number with dots and convert to words in real-time
+    totalValueInput.addEventListener('input', (e) => {
+        let rawValue = e.target.value.replace(/\D/g, '');
+        
+        if (rawValue !== '') {
+            e.target.value = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        } else {
+            e.target.value = '';
+        }
+
+        const numValue = parseInt(rawValue) || 0;
+        console.log(`Valor convertido: ${numberToSpanishWords(numValue)}`);
+    });
 
     // Load clients on startup
     loadClients();
@@ -73,3 +88,75 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// --- Utilities ---
+function numberToSpanishWords(num) {
+    if (num === 0) return 'cero pesos';
+
+    function unidades(n) {
+        switch (n) {
+            case 1: return 'un'; case 2: return 'dos'; case 3: return 'tres';
+            case 4: return 'cuatro'; case 5: return 'cinco'; case 6: return 'seis';
+            case 7: return 'siete'; case 8: return 'ocho'; case 9: return 'nueve';
+            default: return '';
+        }
+    }
+
+    function decenas(n) {
+        const dec = Math.floor(n / 10);
+        const uni = n - (dec * 10);
+        switch (dec) {
+            case 1:
+                switch (uni) {
+                    case 0: return 'diez'; case 1: return 'once'; case 2: return 'doce';
+                    case 3: return 'trece'; case 4: return 'catorce'; case 5: return 'quince';
+                    default: return 'dieci' + unidades(uni).toLowerCase();
+                }
+            case 2: return uni === 0 ? 'veinte' : 'veinti' + unidades(uni).toLowerCase();
+            case 3: return uni === 0 ? 'treinta' : 'treinta y ' + unidades(uni);
+            case 4: return uni === 0 ? 'cuarenta' : 'cuarenta y ' + unidades(uni);
+            case 5: return uni === 0 ? 'cincuenta' : 'cincuenta y ' + unidades(uni);
+            case 6: return uni === 0 ? 'sesenta' : 'sesenta y ' + unidades(uni);
+            case 7: return uni === 0 ? 'setenta' : 'setenta y ' + unidades(uni);
+            case 8: return uni === 0 ? 'ochenta' : 'ochenta y ' + unidades(uni);
+            case 9: return uni === 0 ? 'noventa' : 'noventa y ' + unidades(uni);
+            case 0: return unidades(uni);
+        }
+    }
+
+    function centenas(n) {
+        const cen = Math.floor(n / 100);
+        const dec = n - (cen * 100);
+        switch (cen) {
+            case 1: return dec > 0 ? 'ciento ' + decenas(dec) : 'cien';
+            case 2: return 'doscientos ' + decenas(dec);
+            case 3: return 'trescientos ' + decenas(dec);
+            case 4: return 'cuatrocientos ' + decenas(dec);
+            case 5: return 'quinientos ' + decenas(dec);
+            case 6: return 'seiscientos ' + decenas(dec);
+            case 7: return 'setecientos ' + decenas(dec);
+            case 8: return 'ochocientos ' + decenas(dec);
+            case 9: return 'novecientos ' + decenas(dec);
+            case 0: return decenas(dec);
+        }
+    }
+
+    function miles(n) {
+        const mil = Math.floor(n / 1000);
+        const resto = n - (mil * 1000);
+        const strMil = mil === 0 ? '' : (mil === 1 ? 'mil' : centenas(mil) + ' mil');
+        return (strMil + ' ' + centenas(resto)).trim();
+    }
+
+    function millones(n) {
+        const millon = Math.floor(n / 1000000);
+        const resto = n - (millon * 1000000);
+        if (millon === 0) return miles(resto);
+        
+        const de = resto === 0 ? ' de' : '';
+        const strMillon = millon === 1 ? 'un millón' + de : centenas(millon) + ' millones' + de;
+        return (strMillon + ' ' + miles(resto)).trim();
+    }
+
+    return millones(num) + ' pesos';
+}
