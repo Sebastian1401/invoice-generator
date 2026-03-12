@@ -9,6 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const zoomSlider = document.getElementById('zoom-slider');
     const zoomValue = document.getElementById('zoom-value');
     const invoiceDocument = document.getElementById('invoice-document');
+    
+    // Form Inputs
+    const invoiceDateInput = document.getElementById('invoice-date');
+    const jobConceptInput = document.getElementById('job-concept');
+
+    // Preview Elements
+    const previewDate = document.getElementById('preview-date');
+    const previewClientName = document.getElementById('preview-client-name');
+    const previewClientNit = document.getElementById('preview-client-nit');
+    const previewTotalValue = document.getElementById('preview-total-value');
+    const previewWordsValue = document.getElementById('preview-words-value');
+    const previewConcept = document.getElementById('preview-concept');
 
     // Zoom Logic
     zoomSlider.addEventListener('input', (e) => {
@@ -17,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         invoiceDocument.style.transform = `scale(${scale})`;
     });
 
-    // Format number with dots and convert to words in real-time
+    // Format number with dots and update preview in real-time
     totalValueInput.addEventListener('input', (e) => {
         let rawValue = e.target.value.replace(/\D/g, '');
         
@@ -28,7 +40,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const numValue = parseInt(rawValue) || 0;
-        console.log(`Valor convertido: ${numberToSpanishWords(numValue)}`);
+        
+        previewTotalValue.textContent = e.target.value || '0';
+        previewWordsValue.textContent = numberToSpanishWords(numValue);
+    });
+
+    // Date Logic (Format: DD DE MES DE YYYY)
+    invoiceDateInput.addEventListener('change', (e) => {
+        if (!e.target.value) {
+            previewDate.textContent = '[FECHA]';
+            return;
+        }
+        
+        const [year, month, day] = e.target.value.split('-');
+        const months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+        
+        previewDate.textContent = `${day} DE ${months[parseInt(month) - 1]} DE ${year}`;
+    });
+
+    // Client Selection Logic
+    clientSelect.addEventListener('change', (e) => {
+        const selectedOption = e.target.options[e.target.selectedIndex];
+        
+        if (selectedOption.value) {
+            previewClientName.textContent = selectedOption.dataset.name;
+            previewClientNit.textContent = selectedOption.dataset.nit;
+        } else {
+            previewClientName.textContent = '[NOMBRE DEL CLIENTE O EMPRESA]';
+            previewClientNit.textContent = '[NIT]';
+        }
+    });
+
+    // Concept Logic
+    jobConceptInput.addEventListener('input', (e) => {
+        previewConcept.textContent = e.target.value || '[concepto del trabajo]';
     });
 
     // Load clients on startup
@@ -57,6 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
             loadClients(); 
             
             clientSelect.value = nit; 
+            
+            clientSelect.dispatchEvent(new Event('change'));
         }
     });
 
